@@ -1,0 +1,58 @@
+if(x > y) 
+{ 
+int c = x; x = y; y = c; 
+} 
+if(y > z) 
+{ 
+int c = y; y = z; z = c; 
+
+} 
+if(x > y) 
+{ 
+int c = x; x = y; y = c; 
+} 
+
+x<y<z
+
+_______ 
+.386
+.model flat,stdcall
+.stack 4096
+ExitProcess PROTO, dwExitCode:DWORD
+.data
+x DWORD 3
+y DWORD 2
+z DWORD 1
+.code
+main PROC
+
+
+mov eax, x
+cmp eax, y
+jng doIf2
+mov ebx, y
+mov x, ebx
+mov y, eax
+
+doIf2:
+mov eax, y
+cmp eax, z
+jng If3
+mov ecx, z
+mov y, ecx
+mov z, eax
+
+If3:
+mov eax, x
+cmp eax, y
+jng Done
+mov ecx, y
+mov x, ecx
+mov y, eax
+
+Done:
+
+
+INVOKE ExitProcess,0
+main ENDP
+END main

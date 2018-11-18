@@ -1,0 +1,73 @@
+// Example program
+#include <iostream>
+#include <string>
+
+int main()
+{
+    int i = 1;
+    int buff= 0;
+    int n=10;
+    while(i<=n)
+    {
+        if(i%3==0)
+        {
+            buff+=i;
+            }
+            i++;
+        }
+        
+        std::cout<<buff;
+}
+
+
+
+mov eax, i
+BeginWhile:
+cmp eax, n ; if not (i < n)
+jnl EndWhile ; выйти из цикла
+ :if(i%3==0)
+ jne DoIf
+inc eax
+jmp BeginWhile ; повторить
+DoIf:
+add buff, i
+EndWhile:
+mov i, eax
+
+____________
+.386
+.model flat,stdcall
+.stack 4096
+ExitProcess PROTO, dwExitCode:DWORD
+.data
+i DWORD 1
+n DWORD 4
+a DWORD 0
+const DWORD 3
+null DWORD 0
+buff DWORD 0
+.code
+main PROC
+
+
+mov eax, i
+mov ecx, n
+mov ebx, buff
+mov edx, a
+BeginWhile:
+cmp ecx, null ; if (n<0)
+jng EndWhile ; выйти из цикла
+add edx, const
+add ebx, edx
+add eax, a
+dec ecx
+jmp BeginWhile ; повторить
+EndWhile:
+mov buff, ebx
+
+
+
+
+INVOKE ExitProcess,0
+main ENDP
+END main
