@@ -1,0 +1,197 @@
+#include <iostream>
+#include <mpi.h>
+
+using namespace std;
+int main(int argc, char *argv[]) {
+	int rank, p, q = 1, m = 3, n = 3;
+	int k = 2; //куда вставляю свою строку в строку матрицы
+	int *B = 0; // сама строка(Вектор)
+	MPI_Init(&argc, &argv);
+	MPI_Status status;
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank); // получение ранка
+	//кол-во процессов записываем в p
+	MPI_Comm_size(MPI_COMM_WORLD, &p);
+
+
+	int **A = new int*[n];   // создание 2ву мерного массива 
+	for (int i = 0; i < n; i++)
+		A[i] = new int[m];
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < m; j++)
+			A[i][j] = rank;
+	}
+
+	if (rank == q)    // если это избранный ранк создаем вектор
+	{
+		B = new int[p*m];
+		for (int i = 0; i < p*m; i++)
+
+
+
+			B[i] = i;
+
+
+	}
+	
+	MPI_Scatter(B, m, MPI_INT, A[k], m, MPI_INT, q, MPI_COMM_WORLD);
+	if (rank == 1) {
+		cout << "Process#" << rank << " has received the following stuff: "<<endl;
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++)
+			{
+				cout << A[i][j] << " ";
+			}
+			cout << endl;
+		}
+	}
+
+
+	for (int i = 0; i < n; i++)
+		delete A[i];
+	delete[]A;
+	
+	if (rank == q)
+	{
+			delete[]B;
+	}
+	MPI_Finalize();
+
+
+
+}
+
+
+//это старая лаба
+
+//#include <iostream>
+//#include <mpi.h>
+//
+//#include <random>
+//
+//using namespace std;
+//int main(int argc, char *argv[]) {
+//	int rank, value = 77, n;
+//	MPI_Status status;
+//	MPI_Init(&argc, &argv);
+//	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+//	MPI_Comm_size(MPI_COMM_WORLD, &n);
+//
+//
+//	for (int o = 0; o < n; o++)
+//	{
+//		if (o == 0) {
+//
+//			if (rank == 0) {
+//				value = 0;
+//
+//				for (int t = 0; t < n; t++) {
+//					if (t == o) { continue; }
+//					MPI_Send(&value, 1, MPI_INT, t, 0, MPI_COMM_WORLD);
+//				}
+//
+//
+//				for (int t = 0; t < n; t++) {
+//					if (o == t) { continue; }
+//					if (rank == t) {
+//						MPI_Recv(&value, 1, MPI_INT, o, 0, MPI_COMM_WORLD, &status);
+//					}
+//
+//
+//
+//				}
+//
+//				cout << "Process " << rank << " got " << value << endl;
+//
+//			}
+//
+//
+//
+//
+//
+//		}
+//
+//
+//
+//		else {
+//			if (rank == o) {
+//
+//				value = o;
+//
+//				MPI_Send(&value, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+//			}
+//			if (rank == 0) {
+//
+//				MPI_Recv(&value, 1, MPI_INT, o, 0, MPI_COMM_WORLD, &status);
+//				for (int t = 1; t < n; t++) {
+//					if (t == o) { continue; }
+//					MPI_Send(&value, 1, MPI_INT, t, 0, MPI_COMM_WORLD);
+//				}
+//			}
+//
+//
+//
+//			for (int t = 1; t < n; t++) {
+//				if (t == o) {
+//					continue;
+//					if (rank == o) {
+//						cout << "Process " << rank << " got " << value << endl;
+//					}
+//				}
+//				if (rank == t) {
+//					MPI_Recv(&value, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+//
+//				}
+//				cout << "Process " << rank << " got " << value << endl;
+//			}
+//
+//
+//
+//		}
+//	}
+//
+//
+//
+//	MPI_Finalize();
+//
+//
+//}
+////cout << "Process " << rank << " got " << value << endl;
+//
+//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4.	Раздача данных из одного всем процессам коммуникатора. 
+     int MPI_Scatter (void* send_buf, int send_count, MPI_Datatype send_type, 
+                                   void* recv_buf,  int recv_count, , MPI_Datatype recv_type, 
+                                  int root, MPI_Comm comm)
+        P0       A    B   C  D     Scatter       P0    A   -   -    -
+        P1        -     -    -    -     ????   P1    B   -   -   -
+        P2        -     -    -    -                        P2    C   -   -   -
+        P3        -     -    -    -                        P3    D   -   -   -
+     
+Каждый процесс коммуникатора comm, включая корневой, принимает со¬держимое буфера корневого процесса. Все процес¬сы должны принимать и только корневой должен посылать в требуемом по¬рядке. 
+
+int MPI_Scatterv (void* send_buf, int *send_count, int *displs, 
+                                MPI_Datatype send_type, 
+                                void* recv_buf,  int recv_count, MPI_Datatype recv_type, 
+                               int root, MPI_Comm comm);
+
+Операция  MPI_Scatter обратна операции MPI_Gather.
+
